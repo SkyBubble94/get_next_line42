@@ -6,7 +6,7 @@
 /*   By: bbordere <bbordere@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/02 09:53:05 by bbordere          #+#    #+#             */
-/*   Updated: 2021/12/03 16:05:45 by bbordere         ###   ########.fr       */
+/*   Updated: 2021/12/03 16:11:36 by bbordere         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,11 +63,12 @@ char	*ft_strjoin(char *s1, char *s2)
 	lens1 = ft_strlen(s1);
 	lens2 = ft_strlen(s2);
 	s3 = malloc((lens1 + lens2 + 1) * sizeof(char));
-	if (!s3 || !s1 || !s2)
+	if (!s3)
 		return (NULL);
 	ft_memcpy(s3, s1, lens1);
 	ft_memcpy(s3 + lens1, s2, lens2);
 	s3[lens1 + lens2] = '\0';
+	free(s1);
 	return (s3);
 }
 
