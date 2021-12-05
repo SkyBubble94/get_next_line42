@@ -12,66 +12,6 @@
 
 #include "get_next_line.h"
 
-char	*ft_strchr(const char *str, int c)
-{
-	while (*str != (char) c)
-	{
-		if (*str == '\0' && (char) c != '\0')
-			return (NULL);
-		str++;
-	}
-	return ((char *) str);
-}
-
-size_t	ft_strlen(const char *str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str && str[i])
-		i++;
-	return (i);
-}
-
-void	*ft_memcpy(void *dst, const void *src, size_t n)
-{
-	unsigned char	*source;
-	unsigned char	*dest;
-	size_t			i;
-
-	source = (unsigned char *) src;
-	dest = (unsigned char *) dst;
-	i = 0;
-	if (!dst && !src)
-		return (NULL);
-	if (n == 0)
-		return (dst);
-	while (n--)
-	{
-		dest[i] = source[i];
-		i++;
-	}
-	return (dst);
-}
-
-char	*ft_strjoin(char *s1, char *s2)
-{
-	size_t	lens1;
-	size_t	lens2;
-	char	*s3;
-
-	lens1 = ft_strlen(s1);
-	lens2 = ft_strlen(s2);
-	s3 = malloc((lens1 + lens2 + 1) * sizeof(char));
-	if (!s3)
-		return (NULL);
-	ft_memcpy(s3, s1, lens1);
-	ft_memcpy(s3 + lens1, s2, lens2);
-	s3[lens1 + lens2] = '\0';
-	free(s1);
-	return (s3);
-}
-
 char	*ft_get_line(char *str)
 {
 	int		i;
@@ -96,37 +36,7 @@ char	*ft_get_line(char *str)
 	return (line);
 }
 
-
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-char	*ft_new(char *str)
-{
-	int		i;
-	char	*line;
-	int		j;
-
-	i = 0;
-	if (!str)
-		return (NULL);
-	while (str[i] && str[i] != '\n')
-		i++;
-	if (str[i] == '\n')
-		i++;
-	line = malloc((i + 1) * sizeof(char));
-	if (!line)
-		return (NULL);
-	j = i;
-	i = -1;
-	while (++i < j)
-		line[i] = str[i];
-	line[i] = '\0';
-	free(str);
-	return (line);
-}
-
-char	*ft_buff_to_save(int fd, char *save)
+char	*ft_buff_to_memory(int fd, char *memory)
 {
 	char	*buff;
 	int		reader;
@@ -141,32 +51,54 @@ char	*ft_buff_to_save(int fd, char *save)
 		if (reader == -1)
 		{
 			free(buff);
+			free(memory);
 			return (NULL);
 		}
 		buff[reader] = '\0';
-		save = ft_strjoin(save, buff);
+		memory = ft_strjoin(memory, buff);
 	}	
 	free(buff);
-	return (save);
+	return (memory);
 }
 
-char *get_next_line(int fd)
+char	*ft_reset_memory(char *memory, char *line)
 {
-	char *line;
-	static char *save;
-	
-	save = ft_buff_to_save(fd, save);
+	char	*new;
+	int		memory_size;
+	int		line_size;
+
+	if (memory == NULL || line == NULL)
+		return (NULL);
+	memory_size = ft_strlen(memory);
+	line_size = ft_strlen(line);
+	if (line_size <= 0)
+	{
+		free(memory);
+		return (NULL);
+	}
+	new = malloc(memory_size - line_size + 1);
+	ft_memcpy(new, memory + line_size, memory_size - line_size + 1);
+	free(memory);
+	return (new);
+}
+
+char	*get_next_line(int fd)
+{
+	char		*line;
+	static char	*save;
+
+	save = ft_buff_to_memory(fd, save);
 	if (!save)
 		return (0);
 	line = ft_get_line(save);
-	save = ft_new(save);
+	save = ft_reset_memory(save, line);
 	return (line);
 }
 
-int main(int argc, char const *argv[])
+int	main(int argc, char const *argv[])
 {
 	int fd = open("file", O_RDONLY);
-	int i = 5;
+	int i = 100;
 	char *li;
 	while(i--)
 	{
