@@ -6,7 +6,7 @@
 /*   By: bbordere <bbordere@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/02 09:53:05 by bbordere          #+#    #+#             */
-/*   Updated: 2021/12/03 16:11:36 by bbordere         ###   ########.fr       */
+/*   Updated: 2021/12/07 15:59:26 by bbordere         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ char	*ft_get_line(char *str)
 	int		j;
 
 	i = 0;
-	if (!str)
+	if (!str || str[0] ==  '\0')
 		return (NULL);
 	while (str[i] && str[i] != '\n')
 		i++;
@@ -41,10 +41,11 @@ char	*ft_buff_to_memory(int fd, char *memory)
 	char	*buff;
 	int		reader;
 
+	reader = 1;
 	buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	*buff = '\0';
 	if (!buff)
 		return (NULL);
-	reader = 1;
 	while (!ft_strchr(buff, '\n') && reader != 0)
 	{
 		reader = read(fd, buff, BUFFER_SIZE);
@@ -64,20 +65,20 @@ char	*ft_buff_to_memory(int fd, char *memory)
 char	*ft_reset_memory(char *memory, char *line)
 {
 	char	*new;
-	int		memory_size;
-	int		line_size;
+	int		len_memory;
+	int		len_line;
 
 	if (memory == NULL || line == NULL)
 		return (NULL);
-	memory_size = ft_strlen(memory);
-	line_size = ft_strlen(line);
-	if (line_size <= 0)
+	len_memory = ft_strlen(memory);
+	len_line = ft_strlen(line);
+	if (len_line == 0)
 	{
 		free(memory);
 		return (NULL);
 	}
-	new = malloc(memory_size - line_size + 1);
-	ft_memcpy(new, memory + line_size, memory_size - line_size + 1);
+	new = malloc(len_memory - len_line + 1);
+	ft_memcpy(new, memory + len_line, len_memory - len_line + 1);
 	free(memory);
 	return (new);
 }
@@ -85,24 +86,16 @@ char	*ft_reset_memory(char *memory, char *line)
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*save;
+	static char	*memory;
 
-	save = ft_buff_to_memory(fd, save);
-	if (!save)
-		return (0);
-	line = ft_get_line(save);
-	save = ft_reset_memory(save, line);
+	if (BUFFER_SIZE <= 0 || fd < 0)
+		return (NULL);
+	memory = ft_buff_to_memory(fd, memory);
+	if (!memory)
+		return (NULL);
+	line = ft_get_line(memory);
+	if (!line)
+		return (NULL);
+	memory = ft_reset_memory(memory, line);
 	return (line);
-}
-
-int	main(int argc, char const *argv[])
-{
-	int fd = open("file", O_RDONLY);
-	int i = 100;
-	char *li;
-	while(i--)
-	{
-		li = get_next_line(fd);
-		printf("%s",li);
-	}
 }

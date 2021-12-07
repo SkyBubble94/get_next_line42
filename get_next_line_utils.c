@@ -6,7 +6,7 @@
 /*   By: bbordere <bbordere@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/03 11:44:41 by bbordere          #+#    #+#             */
-/*   Updated: 2021/12/03 11:46:32 by bbordere         ###   ########.fr       */
+/*   Updated: 2021/12/07 14:28:15 by bbordere         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	ft_memcpy(s3, s1, lens1);
 	ft_memcpy(s3 + lens1, s2, lens2);
 	s3[lens1 + lens2] = '\0';
-	free(s1);
+	if (s1)
+		free(s1);
 	return (s3);
 }
