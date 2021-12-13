@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bbordere <bbordere@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/02 09:53:05 by bbordere          #+#    #+#             */
-/*   Updated: 2021/12/09 10:06:50 by bbordere         ###   ########.fr       */
+/*   Updated: 2021/12/13 10:18:27 by bbordere         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 void	*ft_free(char *buff, char *memory)
 {
@@ -88,16 +88,16 @@ char	*ft_reset_memory(char *memory, char *line)
 char	*get_next_line(int fd)
 {
 	char		*line;
-	static char	*memory;
+	static char	*memory[MAX_FD];
 
 	if (BUFFER_SIZE <= 0 || fd < 0)
 		return (NULL);
-	memory = ft_buff_to_memory(fd, memory);
-	if (!memory)
+	memory[fd] = ft_buff_to_memory(fd, memory[fd]);
+	if (!memory[fd])
 		return (NULL);
-	line = ft_get_line(memory);
+	line = ft_get_line(memory[fd]);
 	if (!line)
 		return (NULL);
-	memory = ft_reset_memory(memory, line);
+	memory[fd] = ft_reset_memory(memory[fd], line);
 	return (line);
 }
